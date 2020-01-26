@@ -1,0 +1,66 @@
+master:
+  adminUser: "admin"
+  adminPassword: "admin123$"
+  installPlugins:
+  - kubernetes:1.21.2
+  - workflow-job:2.36
+  - workflow-aggregator:2.6
+  - credentials-binding:1.20
+  - git:4.0.0
+  - kubernetes-cli
+  - maven-metadata-plugin
+  - pipeline-maven
+  - kubernetes-cd
+  - docker-build-step
+
+  serviceType: LoadBalancer
+  jobs:
+    test-job: |-
+      <?xml version='1.0' encoding='UTF-8'?>
+      <project>
+        <keepDependencies>false</keepDependencies>
+        <properties/>
+        <scm class="hudson.scm.NullSCM"/>
+        <canRoam>false</canRoam>
+        <disabled>false</disabled>
+        <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+        <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+        <triggers/>
+        <concurrentBuild>false</concurrentBuild>
+        <builders/>
+        <publishers/>
+        <buildWrappers/>
+      </project>
+    test: |-
+      <?xml version='1.0' encoding='UTF-8'?>
+      <project>
+        <actions/>
+        <description/>
+        <keepDependencies>false</keepDependencies>
+        <properties/>
+        <scm class="hudson.scm.NullSCM"/>
+        <canRoam>true</canRoam>
+        <disabled>false</disabled>
+        <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+        <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+        <triggers/>
+        <concurrentBuild>false</concurrentBuild>
+        <builders>
+        <hudson.tasks.Shell>
+        <command>
+        cat /var/lib/jenkins/jobs/-the-project-name-/config.xml
+        </command>
+        </hudson.tasks.Shell>
+        </builders>
+        <publishers/>
+        <buildWrappers>
+        <org.csanchez.jenkins.plugins.kubernetes.KubectlBuildWrapper plugin="kubernetes@1.18.2">
+        <serverUrl>https://kubernetes.default</serverUrl>
+        <credentialsId/>
+        <caCertificate/>
+        </org.csanchez.jenkins.plugins.kubernetes.KubectlBuildWrapper>
+        </buildWrappers>
+        </project>
+  agent:
+    enabled: false
+# 

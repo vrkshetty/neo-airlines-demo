@@ -1,0 +1,55 @@
+# To config kubectl
+aws eks update-kubeconfig --name AM-EKS-CLUSTER --profile im
+
+apply rbac policy
+kubectl apply -f node-auth.yaml
+
+Mount EFS on nodes modify the host ip and mount dns name
+
+ssh -o StrictHostKeyChecking=no -i my-eks-clust-key.pem ec2-user@18.185.239.253 /bin/bash <<EOF
+ sudo mount -t nfs fs-6fcfce36.efs.eu-central-1.amazonaws.com: /mnt
+ sudo mkdir -p /mnt/export/tmp
+ sudo systemctl restart kubelet
+EOF
+
+ssh -o StrictHostKeyChecking=no -i my-eks-clust-key.pem ec2-user@18.197.143.142 /bin/bash <<EOF
+ sudo mount -t nfs fs-6fcfce36.efs.eu-central-1.amazonaws.com: /mnt
+ sudo mkdir -p /mnt/export/tmp
+ sudo systemctl restart kubelet
+EOF
+
+
+To bring up helm
+
+kubectl create namespace monitoring
+kubectl create namespace dev
+kubectl config set-context $(kubectl config current-context) --namespace=dev
+kubectl --namespace kube-system create serviceaccount tiller
+kubectl create clusterrolebinding tiller --clusterrole cluster-admin  --serviceaccount=kube-system:tiller
+helm init --upgrade --wait --service-account tiller
+
+deploying ingress
+
+helm install --namespace nginx --name nginx  --set rbac.create=true  --set controller.publishService.enabled=true  --set controller.stats.enabled=true  --set controller.service.externalTrafficPolicy=Local  --set controller.service.type=LoadBalancer  --set controller.image.tag="0.21.0"  --set controller.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"="nlb"  stable/nginx-ingress --set controller.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-ssl-cert"="arn:aws:acm:eu-central-1:430323374040:certificate/3f8c352e-6155-404a-a02a-b5219c42e0da"
+
+cd /root/identity-methods/forgeops/samples/config/prod/s-cluster/
+helm install --name dev-frconfig --namespace dev  --values common.yaml --values frconfig.yaml ../../../../helm/frconfig/
+helm install --name dev-dsadmin --namespace dev  --values common.yaml --values dsadmin.yaml ../../../../helm/dsadmin/
+helm install --name dev-configstore --namespace dev  --values common.yaml --values configstore.yaml ../../../../helm/ds/
+helm install --name dev-userstore --namespace dev  --values common.yaml --values userstore.yaml ../../../../helm/ds/
+helm install --name dev-ctsstore --namespace dev  --values common.yaml --values ctsstore.yaml ../../../../helm/ds/
+helm install --name dev-openam --namespace dev  --values common.yaml --values openam.yaml ../../../../helm/openam/
+helm install --name dev-amster --namespace dev  --values common.yaml --values amster.yaml ../../../../helm/amster/
+
+
+
+http://login.dev.whuyu.com/XUI/?service=adminconsoleservice
+kubectl create -f - <<EOF
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: gp2
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+EOF
