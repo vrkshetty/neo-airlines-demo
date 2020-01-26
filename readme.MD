@@ -9,6 +9,7 @@ Terraform code to build EKS infrastructure and Continuous deployment to EKS usin
 ## Requirements
 ```
 Terraform v0.12.3
+kubectl v1.15.0
 Helm v2.14.2
 ```
 
@@ -22,7 +23,7 @@ Apply the terraform
 
 ```terraform apply --var-file=<path-toy-your-tfvars>```
 
-To access jenkins default username `admin` and password `admin123$` 
+To access jenkins default username `admin` and password `admin123$`
 
 ```
 export SERVICE_IP=$(kubectl get svc --namespace tools cicd-jenkins --template "{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}")
