@@ -2,6 +2,9 @@
 
 This library consists of Terraform `Infrastructure as code`  and Helm charts for `configuration as code`. This library deploys EKS cluster and underlying infrastructure and deploys Jenkins for CICD, Nexus for artifacts , docker registry and Grafana for monitoring.
 ![Architecture](images/HLD.png)
+
+
+Terraform code to build EKS infrastructure and Continuous deployment to EKS using Jenkins
 # Installation Steps
 ## Requirements
 ```
@@ -19,6 +22,13 @@ Apply the terraform
 
 ```terraform apply --var-file=<path-toy-your-tfvars>```
 
+To access jenkins default username `admin` and password `admin123$` 
+
+```
+export SERVICE_IP=$(kubectl get svc --namespace tools cicd-jenkins --template "{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}")
+echo http://$SERVICE_IP/login
+```
+
 To destroy the environment helm delete all charts first then destroy terraform
 
 ```terraform destroy --var-file=<path-toy-your-tfvars>```
@@ -30,9 +40,3 @@ Jenkins will be configured using helm chart stable/jenkins as `configuration as 
 ## Nexus and Grafana
 
 Nexus and Grafana will be deployed using helm chart please refer to config files under `helm-config/`
-
-# Architecture
-
-Continuous deployment to EKS using Jenkins
-
-Terraform code will build EKS infrastrcutre

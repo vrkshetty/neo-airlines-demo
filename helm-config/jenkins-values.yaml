@@ -1,6 +1,7 @@
 master:
   adminUser: "admin"
   adminPassword: "admin123$"
+  servicePort: 80
   installPlugins:
   - kubernetes:1.21.2
   - workflow-job:2.36
@@ -63,4 +64,4 @@ master:
         </project>
   agent:
     enabled: false
-# 
+#
