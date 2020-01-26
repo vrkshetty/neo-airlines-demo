@@ -62,11 +62,7 @@ EOT
     helm init --upgrade --wait --service-account tiller
 EOT
 }
-    provisioner "local-exec" {
-      command = <<EOT
-  helm install --namespace default --name cicd stable/jenkins --vaules jekins-values.yaml
-EOT
-    }
+
     depends_on = [aws_eks_cluster.eks_cluster]
 
   }
