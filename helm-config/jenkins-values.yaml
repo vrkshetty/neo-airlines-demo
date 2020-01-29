@@ -1,9 +1,30 @@
+agent:
+  image: "vrkshetty/jenkins-slave"
+  tag: "v1"
+  imagePullSecretName:
+  componentName: "jenkins-slave"
+  privileged: false
+  # volumes:
+  #  - type: HostPath
+  #    volumeName: docker-sock
+  #    hostPath: /var/run/docker.sock
+  #    mountPath: /var/run/docker.sock
+  resources:
+    requests:
+      cpu: "512m"
+      memory: "512Mi"
+    limits:
+      cpu: "250000m"
+      memory: "25000Mi"
 master:
+  image: "vrkshetty/jenkins-master"
+  tag: "v1"
+  imagePullPolicy: "IfNotPresent"
   adminUser: "admin"
   adminPassword: "admin123$"
   servicePort: 80
   installPlugins:
-  - kubernetes:1.21.2
+  - kubernetes:1.23.1
   - workflow-job:2.36
   - workflow-aggregator:2.6
   - credentials-binding:1.20
@@ -13,6 +34,9 @@ master:
   - pipeline-maven
   - kubernetes-cd
   - docker-build-step
+  - nexus-artifact-uploader
+  - s3
+  - pipeline-aws
 
   serviceType: LoadBalancer
   jobs:
@@ -38,7 +62,7 @@ master:
         <userRemoteConfigs>
         <hudson.plugins.git.UserRemoteConfig>
         <url>
-        https://github.com/vrkshetty/spring-boot-hello-world.git
+        https://github.com/vrkshetty/spring-boot-cicd.git
         </url>
         </hudson.plugins.git.UserRemoteConfig>
         </userRemoteConfigs>
@@ -78,7 +102,7 @@ master:
             <configVersion>2</configVersion>
             <userRemoteConfigs>
               <hudson.plugins.git.UserRemoteConfig>
-                <url>https://github.com/vrkshetty/spring-boot-hello-world.git</url>
+                <url>https://github.com/vrkshetty/spring-boot-cicd.git</url>
               </hudson.plugins.git.UserRemoteConfig>
             </userRemoteConfigs>
             <branches>
@@ -96,6 +120,95 @@ master:
         <triggers/>
         <disabled>false</disabled>
       </flow-definition>
-  agent:
-    enabled: false
-#
+    deploy-test: |-
+      <?xml version='1.1' encoding='UTF-8'?>
+      <flow-definition plugin="workflow-job@2.36">
+        <description></description>
+        <keepDependencies>false</keepDependencies>
+        <properties>
+          <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+            <triggers>
+              <hudson.triggers.SCMTrigger>
+                <spec>H/15 * * * *</spec>
+                <ignorePostCommitHooks>false</ignorePostCommitHooks>
+              </hudson.triggers.SCMTrigger>
+            </triggers>
+          </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+        </properties>
+        <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@2.78">
+          <scm class="hudson.plugins.git.GitSCM" plugin="git@4.1.1">
+            <configVersion>2</configVersion>
+            <userRemoteConfigs>
+              <hudson.plugins.git.UserRemoteConfig>
+                <url>https://github.com/vrkshetty/deploy-test.git</url>
+              </hudson.plugins.git.UserRemoteConfig>
+            </userRemoteConfigs>
+            <branches>
+              <hudson.plugins.git.BranchSpec>
+                <name>*/master</name>
+              </hudson.plugins.git.BranchSpec>
+            </branches>
+            <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+            <submoduleCfg class="list"/>
+            <extensions/>
+          </scm>
+          <scriptPath>Jenkinsfile</scriptPath>
+          <lightweight>true</lightweight>
+        </definition>
+        <triggers/>
+        <disabled>false</disabled>
+      </flow-definition>
+    push-build: |-
+      <?xml version='1.1' encoding='UTF-8'?>
+      <flow-definition plugin="workflow-job@2.36">
+        <description></description>
+        <keepDependencies>false</keepDependencies>
+        <properties>
+          <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+            <triggers>
+              <hudson.triggers.SCMTrigger>
+                <spec>H/15 * * * *</spec>
+                <ignorePostCommitHooks>false</ignorePostCommitHooks>
+              </hudson.triggers.SCMTrigger>
+            </triggers>
+          </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+        </properties>
+        <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@2.78">
+          <scm class="hudson.plugins.git.GitSCM" plugin="git@4.1.1">
+            <configVersion>2</configVersion>
+            <userRemoteConfigs>
+              <hudson.plugins.git.UserRemoteConfig>
+                <url>https://github.com/vrkshetty/kaniko-push.git</url>
+              </hudson.plugins.git.UserRemoteConfig>
+            </userRemoteConfigs>
+            <branches>
+              <hudson.plugins.git.BranchSpec>
+                <name>*/master</name>
+              </hudson.plugins.git.BranchSpec>
+            </branches>
+            <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+            <submoduleCfg class="list"/>
+            <extensions/>
+          </scm>
+          <scriptPath>Jenkinsfile</scriptPath>
+          <lightweight>true</lightweight>
+        </definition>
+        <triggers/>
+        <disabled>false</disabled>
+      </flow-definition>
+serviceAccount:
+  create: false
+  # The name of the service account is autogenerated by default
+  name: build-robot
+  annotations: {}
+
+serviceAccountAgent:
+  # Specifies whether a ServiceAccount should be created
+  create: false
+  # The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: build-robot
+  annotations: {}
+
+# vrkshetty/jenkins-master
+# vrkshetty/jenkins-slave

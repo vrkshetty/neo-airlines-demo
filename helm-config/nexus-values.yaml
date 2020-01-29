@@ -1,2 +1,36 @@
+nexus:
+  service:
+    type: LoadBalancer
+  hostAliases:
+  - ip: "192.168.1.10"
+    hostnames:
+    - "docker.intuitum.io"
+    - "nexus.intuitum.io"
 service:
-  type: LoadBalancer
+  name: additional-svc
+  enabled: true
+  labels: {}
+  annotations: {}
+  ports:
+  - name: nexus-service
+    targetPort: 80
+    port: 80
+ingress:
+  enabled: true
+  path: /
+  annotations: {}
+  # # NOTE: Can't use 'false' due to https://github.com/jetstack/kube-lego/issues/173.
+  # kubernetes.io/ingress.allow-http: true
+  # kubernetes.io/ingress.class: gce
+  # kubernetes.io/ingress.global-static-ip-name: ""
+  # kubernetes.io/tls-acme: true
+  tls:
+    enabled: true
+    secretName: nexus-tls
+  rules:
+    - host: nexus.intuitum.io
+      http:
+        paths:
+        - backend:
+            serviceName: additional-svc
+            servicePort: 80

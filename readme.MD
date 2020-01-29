@@ -1,6 +1,6 @@
 # Architecture
 
-This library consists of Terraform `Infrastructure as code`  and Helm charts for `configuration as code`. This library deploys EKS cluster and underlying infrastructure and deploys Jenkins for CICD, Nexus for artifacts , docker registry and Grafana for monitoring.
+This library consists of Terraform `Infrastructure as code`  and Helm charts for `configuration as code`. This library deploys EKS cluster and underlying infrastructure and deploys Jenkins for CICD, S3 bucket for artifacts , docker registry and Grafana for monitoring.
 ![Architecture](images/HLD.png)
 
 
@@ -11,6 +11,8 @@ Terraform code to build EKS infrastructure and Continuous deployment to EKS usin
 Terraform v0.12.3
 kubectl v1.15.0
 Helm v2.14.2
+jq
+docker
 ```
 
 Create env.tfvar file with the values of your choice refer to templates/sample.tfvar  only value of `ssh-key-name` must be set to your own ssh key name rest all can be default setting.
