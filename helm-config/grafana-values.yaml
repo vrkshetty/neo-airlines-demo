@@ -1,2 +1,56 @@
 service:
   type: LoadBalancer
+adminUser: admin
+adminPassword: admin123$
+datasources:
+ datasources.yaml:
+   apiVersion: 1
+   datasources:
+   - name: Prometheus
+     type: prometheus
+     url: http://prometheus-server.tools.svc.cluster.local
+     access: proxy
+     isDefault: true
+dashboards:
+  default:
+    # kubernetes-capacity:
+    #   datasource: Prometheus
+    #   gnetId: 5309
+    # kubernetes-cluster-health:
+    #   datasource: Prometheus
+    #   gnetId: 5312
+    kubernetes-cluster-monitoring-via-prometheus:
+      datasource: Prometheus
+      gnetId: 1621
+    # kubernetes-cluster-status:
+    #   datasource: Prometheus
+    #   gnetId: 5315
+    # kubernetes-deployment:
+    #   datasource: Prometheus
+    #   gnetId: 5303
+    # kubernetes-master-status:
+    #   datasource: Prometheus
+    #   gnetId: 5318
+    # kubernetes-node-exporter-full:
+    #   datasource: Prometheus
+    #   gnetId: 3320
+    # kubernetes-nodes:
+    #   datasource: Prometheus
+    #   gnetId: 5324
+    # kubernetes-pods:
+    #   datasource: Prometheus
+    #   gnetId: 5327
+    # kubernetes-resource-requests:
+    #   datasource: Prometheus
+    #   gnetId: 5321
+    # kubernetes-statefulsets:
+    #   datasource: Prometheus
+    #   gnetId: 5330
+    # node-exporter-service-metrics:
+    #   datasource: Prometheus
+    #   gnetId: 405
+    #   revision: 6
+    # prometheus-stats:
+    #   datasource: Prometheus
+    #   gnetId: 2
+    #   revision: 2

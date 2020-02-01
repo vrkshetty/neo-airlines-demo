@@ -6,7 +6,7 @@ EOT
   }
   provisioner "local-exec" {
     command = <<EOT
-    helm install --namespace tools --name nexus stable/sonatype-nexus --values helm-config/nexus-values.yaml
+    helm install --namespace tools --name prometheus stable/prometheus --values helm-config/prometheus-vaules.yaml
 EOT
   }
   provisioner "local-exec" {
