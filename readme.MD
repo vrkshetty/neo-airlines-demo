@@ -1,7 +1,7 @@
 # Architecture
 
 This library consists of Terraform `Infrastructure as code`  and Helm charts for `configuration as code`. This library deploys EKS cluster and underlying infrastructure and deploys Jenkins for CICD, S3 bucket for artifacts , docker registry and Grafana for monitoring.
-![Architecture](images/HLD.png)
+![Architecture](images/HLD-2.png)
 
 
 Terraform code to build EKS infrastructure and Continuous deployment to EKS using Jenkins
@@ -40,6 +40,12 @@ To destroy the environment helm delete all charts first then destroy terraform
 
 Jenkins will be configured using helm chart stable/jenkins as `configuration as a code ` this can be viewed/ modified on `helm-config/jenkins-values.yaml`
 
-## Nexus and Grafana
+## Prometheus and Grafana
 
-Nexus and Grafana will be deployed using helm chart please refer to config files under `helm-config/`
+Prometheus and Grafana will be deployed using helm chart please refer to config files under `helm-config/`
+
+To access grafana obtain Loadbalancer url
+
+```
+kubectl get svc -n tools | grep grafana
+```
