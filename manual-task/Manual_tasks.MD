@@ -9,7 +9,7 @@ Create IAM User AWS Credentials with write access to S3 for Jenkins add it in Je
 apiVersion: v1
 data:
   config.json: "{\n\t\"auths\": {\n\t\t\"https://index.docker.io/v1/\": {\n\t\t\t\"auth\":
-    \"dnJrc2hldHR5OlBhbGlvMS4y\"\n\t\t}\n\t},\n\t\"HttpHeaders\": {\n\t\t\"User-Agent\":
+    \"dnJrc2hlasdfasdf\"\n\t\t}\n\t},\n\t\"HttpHeaders\": {\n\t\t\"User-Agent\":
     \"Docker-Client/19.03.5 (linux)\"\n\t}\n}"
 kind: ConfigMap
 metadata:
